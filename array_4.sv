@@ -1,4 +1,4 @@
-module sv1;
+module array_4;
     reg [31:0] arr1[0:14];
     reg [31:0] arr2[0:14];
     reg [3:0] random_value;
