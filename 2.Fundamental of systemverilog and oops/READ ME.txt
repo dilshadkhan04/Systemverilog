@@ -1,0 +1,30 @@
+# SystemVerilog Code Repository
+
+Welcome to the SystemVerilog Code Repository. This repository contains various SystemVerilog (`.sv`) files that demonstrate different codes and learnings. 
+
+## Important Note
+
+The file names and structures are organized based on the context and learnings from specific topics and exercises. Due to this, the files are not intended to be run directly as source files. Instead, they serve as reference material and examples for you to learn from.
+
+## Usage Instructions
+
+- **Do Not Run Directly:** The files in this repository are not meant to be run directly as source files. They are organized in a way that reflects the specific code examples and learning contexts.
+- **Copying Code:** You are welcome to copy the code snippets and examples from these files into your own projects. Be sure to integrate them properly with your project’s structure and environment.
+
+## Repository Structure
+
+The repository is structured as follows:
+
+- Each file is named according to the specific code example or learning topic it covers.
+- File extensions are `.sv` for SystemVerilog code files.
+
+## Contributing
+
+If you have any suggestions or improvements, feel free to open a pull request or submit an issue. Your contributions are welcome!
+
+## License
+
+This repository is licensed under the MIT License. For more details, please refer to the LICENSE file.
+
+Happy coding!
+
