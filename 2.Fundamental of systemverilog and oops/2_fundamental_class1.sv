@@ -1,42 +1,37 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 04.02.2025 01:59:32
-// Design Name: 
-// Module Name: fundamental_class1
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
+class Generator;
+  reg [2:0] data1;
+  reg [1:0] data2;
+  reg [3:0] data3;
 
+  // Constructor to initialize data members
+  function new();
+    data1 = 3'b000;
+    data2 = 2'b00;
+    data3 = 4'b0000;
+  endfunction
 
-class first;
-
-reg[2:0] data;
-reg [1:0] data2;
-
+  // Display method to print values
+  function void display();
+    $display("data1: %0d, data2: %0d, data3: %0d", data1, data2, data3);
+  endfunction
 endclass
+module tb;
+  Generator g; // g is a handler, just like uut or dut in Verilog
 
-module fundamental_class1;
-first f; // f is handler just like uut or dut in verilog
-initial begin
-f = new(); //constructor (create an object)
-f.data = 3'b010;
-f.data2 = 2'b10;
-f = null; // delete an object
-#1;
-$display("value of data:%0d and data2 :%0d",f.data,f.data2);
+  initial begin
+    g = new(); // Create an object (constructor)
+    g.data1 = 3'b010;
+    g.data2 = 2'b10;
+    g.data3 = 4'b1101;
+    g.display(); // Display the values
 
-end
+    g = null; // Delete the object
+
+    // Ensure the object is not accessed after deletion to avoid runtime errors
+    // Uncommenting the next line will cause a runtime error
+    // g.display(); 
+  end
 endmodule
-//Create a Class consisting of 3 
+
+/*
+# KERNEL: data1: 2, data2: 2, data3: 13

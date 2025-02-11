@@ -39,3 +39,7 @@ end
 end
 
 endmodule
+
+/*
+# KERNEL: Answer is : 132
+# KERNEL: Test passed

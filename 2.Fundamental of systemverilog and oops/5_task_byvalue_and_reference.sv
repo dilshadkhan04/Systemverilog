@@ -1,54 +1,59 @@
 module tb;
- 
-  //////pass by value
-  
-  task swap ( input bit [1:0] a, [1:0] b); 
+
+  ////// Pass by Value
+  task swap_by_value(input bit [1:0] a, input bit [1:0] b); 
     bit [1:0] temp;
     temp = a;
     a = b;
     b = temp;   
-    $display("Value of a : %0d and b : %0d", a,b);
+    $display("Pass by Value - a: %0d, b: %0d", a, b);
   endtask
   
-  
-  
-  
-  
-  
-  //////pass by reference
-  
-   task automatic swap ( ref bit [1:0] a, [1:0] b); /// function automatic bit [1:0] add (arguments);
+  ////// Pass by Reference
+  task automatic swap_by_ref(ref bit [1:0] a, ref bit [1:0] b); 
     bit [1:0] temp;
     temp = a;
     a = b;
     b = temp;
-    
-    $display("Value of a : %0d and b : %0d", a,b);
+    $display("Pass by Reference - a: %0d, b: %0d", a, b);
   endtask
- 
-  
-  ////restrict access to variables
-  task automatic swap (const ref bit [1:0] a, ref bit [1:0] b); /// function automatic bit [1:0] add (arguments);
+
+  //// Restrict Access to Variables
+  task automatic swap_const_ref(const ref bit [1:0] a, ref bit [1:0] b); 
     bit [1:0] temp;
-    
     temp = a;
-  //  a = b;
+    // a = b; // This line is commented out since 'a' is const ref
     b = temp;
-    
-    $display("Value of a : %0d and b : %0d", a,b);
+    $display("Const Ref - a: %0d, b: %0d", a, b);
   endtask
   
   bit [1:0] a;
   bit [1:0] b;
-  
+
   initial begin
     a = 1;
     b = 2;
     
-    swap(a,b);
+    // Demonstrating pass by value
+    swap_by_value(a, b);
+    $display("After Pass by Value - a: %0d, b: %0d", a, b);
     
-    $display("Value of a : %0d and b : %0d", a,b);
+    // Demonstrating pass by reference
+    swap_by_ref(a, b);
+    $display("After Pass by Reference - a: %0d, b: %0d", a, b);
+    
+    // Demonstrating restricted access to variables
+    swap_const_ref(a, b);
+    $display("After Const Ref - a: %0d, b: %0d", a, b);
   end
-  
-  
+
 endmodule
+
+
+/*
+# KERNEL: Pass by Value - a: 2, b: 1
+# KERNEL: After Pass by Value - a: 1, b: 2
+# KERNEL: Pass by Reference - a: 2, b: 1
+# KERNEL: After Pass by Reference - a: 2, b: 1
+# KERNEL: Const Ref - a: 2, b: 2
+# KERNEL: After Const Ref - a: 2, b: 2

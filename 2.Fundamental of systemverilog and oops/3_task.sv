@@ -15,6 +15,7 @@ b=7;
   add(a,b,y);
   $display("Value of Y: %0d",y);
 end
+endmodule
 
 /* 
 // We declared variable prior to task and can ignore the arguement here
@@ -38,4 +39,4 @@ end
 
 endmodule
 
-/*
+/*# KERNEL: Value of Y: 14

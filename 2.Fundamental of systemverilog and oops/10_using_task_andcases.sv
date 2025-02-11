@@ -43,3 +43,5 @@ module tb;
   
 endmodule
 
+/*
+# KERNEL: Value of a : 4, b : 5 and c : 23 and sum : 32

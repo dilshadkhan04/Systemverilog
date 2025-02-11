@@ -30,3 +30,5 @@ module tb;
   
 endmodule
 
+/*
+# KERNEL: Value of Data1 : 23, Data2 : 4 and Data3 : 5

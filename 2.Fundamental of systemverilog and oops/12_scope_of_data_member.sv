@@ -44,3 +44,5 @@ module tb;
   
   endmodule
  
+ /*
+ # KERNEL: Value of data : 123

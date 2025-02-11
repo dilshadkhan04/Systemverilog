@@ -50,3 +50,16 @@ end
 
 
 endmodule
+
+/*
+# KERNEL: a : 3 and b:11 and y : 14
+# KERNEL: a : 11 and b:3 and y : 14
+# KERNEL: a : 4 and b:9 and y : 13
+# KERNEL: a : 15 and b:15 and y : 30
+# KERNEL: a : 4 and b:1 and y : 5
+# KERNEL: a : 10 and b:12 and y : 22
+# KERNEL: a : 11 and b:9 and y : 20
+# KERNEL: a : 5 and b:15 and y : 20
+# KERNEL: a : 11 and b:13 and y : 24
+# KERNEL: a : 14 and b:9 and y : 23
+# KERNEL: a : 8 and b:3 and y : 11

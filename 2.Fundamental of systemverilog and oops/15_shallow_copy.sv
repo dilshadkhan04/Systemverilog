@@ -38,6 +38,8 @@ second s1,s2;
 
 endmodule
 
-
-
+/*
+# KERNEL: Value of ds :45 
+# KERNEL: Value of ds :45 
+# KERNEL: Value of data :56
   

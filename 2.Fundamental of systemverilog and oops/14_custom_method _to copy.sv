@@ -39,3 +39,6 @@ endmodule
   end/*
   
 endmodule
+
+
+KERNEL: Data : 34 and TEMP : 11

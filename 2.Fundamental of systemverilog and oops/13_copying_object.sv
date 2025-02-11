@@ -25,3 +25,7 @@ module tb;
   end
   
 endmodule
+
+/*
+# KERNEL: Value of data member : 24
+# KERNEL: Value of data member : 24

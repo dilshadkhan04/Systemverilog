@@ -1,24 +1,3 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 04.02.2025 15:54:05
-// Design Name: 
-// Module Name: using_funct
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
 
 module using_funct;
 
@@ -33,3 +12,6 @@ res = add(4'b0100, 4'b0010);
 $display("Value of addition : %0d",res);
 end
 endmodule
+/*
+
+KERNEL: Value of addition : 6
