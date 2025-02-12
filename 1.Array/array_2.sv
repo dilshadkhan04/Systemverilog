@@ -11,3 +11,7 @@ module array_2; // queue and push pop
     $display("Queue After Pop: %p", queue);
   end
 endmodule
+
+/*
+# KERNEL: Queue Before Pop: '{10, 20, 30}
+# KERNEL: Queue After Pop: '{20, 30}

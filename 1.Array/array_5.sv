@@ -24,3 +24,5 @@ module array_5;
     $display("%0p",arr1);
     end
         endmodule
+/*
+# KERNEL: 7 14 21 28 35 42 49 5 10 15 20 25 30 35 40 45 50 55 60 65

@@ -16,3 +16,7 @@ module array_4;
         end
        
         endmodule
+		
+		/*
+		# KERNEL: Arr1 : 5 12 14 7 8 14 8 0 12 14 2 5 5 9 0
+# KERNEL: Arr2 : 10 12 13 13 9 11 1 13 1 8 0 3 10 10 3

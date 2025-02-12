@@ -11,3 +11,6 @@ module array_3;
     $display("Fixed Array: %p", arr);
   end
 endmodule
+
+/*
+# KERNEL: Fixed Array: '{161, 178, 195, 212, 229}

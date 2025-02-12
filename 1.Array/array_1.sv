@@ -15,3 +15,6 @@ module array_1;  //multidimensional array
     $display("Matrix[1][1]: %h", matrix[1][1]); // Should print 5
   end
 endmodule
+
+/*
+# KERNEL: Matrix[1][1]: 5

@@ -18,3 +18,6 @@ for (int i = 0; i < 20; i = i + 1) begin
     end
 
         endmodule
+/*
+# KERNEL: arr1 : 18 9 4 18 4 5 4 12 1 16 6 1 15 1 0 9 13 0 17 16
+# KERNEL: arr2 : 16 17 0 13 9 0 1 15 1 6 16 1 12 4 5 4 18 4 9 18
