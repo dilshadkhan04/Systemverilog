@@ -25,7 +25,7 @@ interface add_if;
   logic [4:0] sum;
   logic clk;
   
-  modport DRV (input a,b, input sum,clk);
+  modport DRV (input a,b, input sum,clk); //To prevent incorrect triggering or 
   
  
   
