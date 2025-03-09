@@ -1,0 +1,350 @@
+module FIFO(input clk,rst,wr,rd,
+            input [7:0] din, output reg[7:0] dout,
+            output empty , full);
+
+  reg [3:0] wptr = 0 , rptr = 0;
+  reg[4:0] cnt = 0;
+  reg [7:0 mem [15:0];
+       
+       always@(posedge clk) 
+         begin
+           if(rst == 1'b1)
+             begin
+               wptr<= 0;
+               rptr <= 0;
+               cnt <= 0;
+             end
+           else if(wr && !full) 
+             begin
+               mem[wptr] <= din;
+               wptr<= wptr + 1;
+               cnt <= cnt + 1;
+               
+             end
+           else if(rd && !empty)
+             begin
+               dout <= mem[rptr];
+               rptr<= rptr + 1;
+               cnt <= cnt -1 ;
+             end
+               
+         end
+       
+       assign empty = (cnt == 0) ? 1'b1 : 1'b0;
+       assign full = (cnt == 16) ? 1'b1 : 1'b0;
+       
+       endmodule
+
+interface fifo_if;
+  logic clock,rd,wr;
+  logic full,empty;
+  logic [7:0] data_in;
+  logic [7:0] data_out;
+  logic rst;
+  
+endinterface
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class transaction;
+
+  rand bit oper;
+  bit rd,rt;
+  bit [7:0] data_in;
+  bit full,empty;
+  bit [7:0] data_out;
+  
+  constraint oper_ctrl { 
+    oper dist {1:/ 50, 0:/ 50};  //Read operation for 50 percent of time and write operation for 50 percent of time
+    
+  }
+  
+endclass
+ 
+//////////////////////////////////////////////////
+ 
+class generator;
+  transaction tr;  // Define a transaction object
+  mailbox #(transaction) mbx; // Used to transmit data to driver
+  
+  //Did not utilise a mailbox to sending golden data from GEN to SCO in this design as compared to previous rather we are using a queue 
+  
+  int count = 0; // Keeping track of number of stimuli sent to DUT
+  int i = 0; // count iteration
+  event next; // know when to send next transaction
+  
+ event done; // conveys completion of number of requested transaction
+  
+  
+  function new(mailbox #(transaction) mbx, mailbox #(transaction) mbxref);
+    this.mbx = mbx;  // Initialize the mailbox for the driver
+    tr = new(); // Create a new transaction object
+  endfunction
+  
+  task run();
+    repeat(count) begin
+      assert(tr.randomize) else $error("[GEN] : RANDOMIZATION FAILED");
+          i++;
+      mbx.put(tr);
+      $display("[GEN] : Oper : %0d iteration : %0d" , tr,oper,i);
+      @(next);
+    end
+    ->done; // Trigger "done" event when all stimuli are applied
+  endtask
+  
+endclass
+ 
+//////////////////////////////////////////////////////////
+ 
+class driver;
+    virtual fifo_if fif; // Virtual interface for DUT
+  
+    mailbox #(transaction) mbx; // Create a mailbox to receive data from the generator
+  
+  transaction datac; // Define a transaction object
+  
+  event next;
+
+
+  
+  function new(mailbox #(transaction) mbx);
+    this.mbx = mbx; // Initialize the mailbox for receiving data
+  endfunction
+  
+  task reset();
+    fif.rst <= 1'b1; // Assert reset signal
+    fif.rd <= 1'b0;
+    fif.wr<=1'b0;
+    fif.data_in <= 0;
+    repeat(5) @(posedge fif.clk); // Wait for 5 clock cycles
+    fif.rst <= 1'b0; // Deassert reset signal
+
+    $display("[DRV] : RESET DONE"); // Display reset completion message
+    $display("----------------------");
+  endtask
+  
+  task write();
+    @(posedge fif.clock);
+    fif.rst = 1'b0;
+    fif.rd <= 1'b0;
+    fif.wr<=1'b1;
+    fif.data_in <= $urandom_range(1,10);
+    @(posedge fif.clock);
+    fif.wr<=1'b0;
+    $display("[DRV] : DATA WRITE data : %0d", fif.data_in);
+    @(posedge fif.clock);
+  endtask
+ 
+  task read()
+    @(posedge fif.clock);
+    fif.rst = 1'b0;
+    fif.rd <= 1'b1;
+    fif.wr<=1'b0;
+    @(posedge fif.clock);
+    fif.rd<=1'b0;
+    $display("[DRV] : DATA READ");
+    @(posedge fif.clock);
+    
+  endtask
+
+  //Applying random stimuli to DUT
+task run();
+  
+  forever begin
+    
+    mbx.get(datac);
+    if(datac.oper == 1'b1)
+      write();
+    else
+      read();
+    
+  end
+  
+endtask
+endclass
+ 
+//////////////////////////////////////////////////////
+ 
+class monitor;
+   virtual fifo_if fif; 
+  
+  transaction tr; // Define a transaction object
+  
+  mailbox #(transaction) mbx; // Create a mailbox to send data to the scoreboard
+ 
+  function new(mailbox #(transaction) mbx);
+    this.mbx = mbx; // Initialize the mailbox for sending data to the scoreboard
+  endfunction
+  
+  task run();
+    tr = new(); // Create a new transaction
+    forever begin
+      repeat(2) @(posedge vif.clk); // Wait for two rising edges of the clock
+      tr.wr = fif.wr;
+      tr.rd = fif.rd;
+      tr.data_in = fif.data_in;
+      tr.full = fif.full;
+      tr.empty = fif.empty;
+      @(posedge fif.clock);
+      tr.data_out = fif.data_out;
+      mbx.put(tr);
+      $display("[MON] : wr : %0d rd : %0d din : %0d dout : %0d full : %0d empty : %0d", tr.wr,tr.rd,tr.din,tr.dout,tr.full,tr.empty);
+    end
+  endtask
+  
+endclass
+ 
+////////////////////////////////////////////////////
+ 
+class scoreboard;
+  transaction tr; // Define a transaction object
+  mailbox #(transaction) mbx; // Create a mailbox to receive data from the driver
+  event next; // Event to signal completion of scoreboard work
+  
+  bit [&:0] din[$]; // Added a queue discussed above as new method
+  bit[7:0] temp; // temp int variable collecting no of time incorrect result
+  int err =0;
+ 
+  function new(mailbox #(transaction) mbx);
+    this.mbx = mbx; // Initialize the mailbox for receiving data from the driver
+  endfunction
+  
+  task run();
+    forever begin
+
+      mbx.get(tr);
+      $display("[SCO] : wr : %0d% rd: %0d din : %0d dout : %0d full : %0d empty : %0d", tr.wr,tr.rd,tr.din,tr.dout,tr.full,tr.empty);
+      if(tr.wr == 1'b1) 
+        begin
+          if(tr.full == 1'b0)
+            begin
+              din_push_front(tr,data_in);
+              $display("[SCO] : DATA STORED IN QUEUE : %0d", tr.data_in);
+            end
+          else
+            begin
+              $display("[SCO] : FIFO is full");
+            end
+          $display("---------------");
+        end
+      if(tr.rd == 1'b1)
+        begin
+          
+          if(tr.empty == 1'b0)
+            begin
+              temp = din.pop_back();
+              if(tr.data_out == temp)
+                $display("[SCO] : DATA MATCH");
+              else begin
+                $error("[SCO] : DATA MISMATCH");
+                err+;
+              end
+          
+        end
+          else 
+            begin
+
+              $display("FIFO is empty");
+            end
+          ->next;
+        end
+  endtask
+  
+endclass
+ 
+////////////////////////////////////////////////////////
+ 
+class environment;
+  generator gen; // Generator instance
+  driver drv; // Driver instance
+  monitor mon; // Monitor instance
+  scoreboard sco; // Scoreboard instance
+
+ 
+  mailbox #(transaction) gdmbx; // Mailbox for communication between generator and driver
+  mailbox #(transaction) msmbx; // Mailbox for communication between monitor and scoreboard
+
+  
+  virtual dff_if vif; // Virtual interface for DUT
+ 
+  function new(virtual dff_if vif);
+    gdmbx = new(); // Create a mailbox for generator-driver communication
+    mbxref = new(); // Create a mailbox for generator-scoreboard reference data
+    gen = new(gdmbx, mbxref); // Initialize the generator
+    drv = new(gdmbx); // Initialize the driver
+    msmbx = new(); // Create a mailbox for monitor-scoreboard communication
+    mon = new(msmbx); // Initialize the monitor
+    sco = new(msmbx, mbxref); // Initialize the scoreboard
+    this.vif = vif; // Set the virtual interface for DUT
+    drv.vif = this.vif; // Connect the virtual interface to the driver
+    mon.vif = this.vif; // Connect the virtual interface to the monitor
+    gen.sconext = next; // Set the communication event between generator and scoreboard
+    sco.sconext = next; // Set the communication event between scoreboard and generator
+  endfunction
+  
+  task pre_test();
+    drv.reset(); // Perform the driver reset
+  endtask
+  
+  task test();
+    fork
+      gen.run(); // Start generator
+      drv.run(); // Start driver
+      mon.run(); // Start monitor
+      sco.run(); // Start scoreboard
+    join_any
+  endtask
+  
+  task post_test();
+    wait(gen.done.triggered); // Wait for generator to complete
+    $finish(); // Finish simulation
+  endtask
+  
+  task run();
+    pre_test(); // Run pre-test setup
+    test(); // Run the test
+    post_test(); // Run post-test cleanup
+  endtask
+endclass
+ 
+/////////////////////////////////////////////////////
+ 
+module tb;
+  dff_if vif(); // Create DUT interface
+ 
+  dff dut(vif); // Instantiate DUT
+  
+  initial begin
+    vif.clk <= 0; // Initialize clock signal
+  end
+  
+  always #10 vif.clk <= ~vif.clk; // Toggle the clock every 10 time units
+  
+  environment env; // Create environment instance
+ 
+  initial begin
+    env = new(vif); // Initialize the environment with the DUT interface
+    env.gen.count = 30; // Set the generator's stimulus count
+    env.run(); // Run the environment
+  end
+  
+  initial begin
+    $dumpfile("dump.vcd"); // Specify the VCD dump file
+    $dumpvars; // Dump all variables
+  end
+endmodule
+//////////////////////////////////////////////////
